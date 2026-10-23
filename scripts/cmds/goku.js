@@ -8,7 +8,7 @@ const response = await axios.get("https://raw.githubusercontent.com/aura-mahmud/
 };
 
 /**
-* @author MahMUD
+* @author Saan
 * @author: do not delete it
 */
 
