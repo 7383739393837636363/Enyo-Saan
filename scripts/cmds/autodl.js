@@ -1,150 +1,150 @@
 const axios = require("axios");
-const fs = require("fs");
 
 const baseApiUrl = async () => {
-        const base = await axios.get("https://raw.githubusercontent.com/aura-mahmud/HINATA/main/baseApiUrl.json");
-        return base.data.mahmud69;
+const base = await axios.get("https://raw.githubusercontent.com/aura-mahmud/HINATA/main/baseApiUrl.json");
+return base.data.mahmud69;
 };
 
 module.exports = {
-        config: {
-                name: "autodl",
-                version: "2.7",
-                author: "Saan",
-                countDown: 0,
-                role: 0,
-                description: {
-                        en: "Auto download video from Tiktok, Facebook, Instagram, YouTube, and more",
-                        vi: "Tự động tải xuống video từ Tiktok, Facebook, Instagram, YouTube và nhiều hơn nữa"
-                },
-                category: "media",
-                guide: {
-                        en: '   {pn} <video_link>: Automatically download videos from TikTok, YouTube, Twitter/X, Facebook, Instagram, Tumblr, Threads, Spotify, SoundCloud, Snapchat, Reddit, Pinterest, LinkedIn, Kuaishou, Kwai, Douyin, Dailymotion, CapCut, and Bluesky'
-                                + '\n   (Or use by replying to a message containing a link)',
-                        vi: '   {pn} <video_link>: Tự động tải video từ TikTok, YouTube, Twitter/X, Facebook, Instagram, Tumblr, Threads, Spotify, SoundCloud, Snapchat, Reddit, Pinterest, LinkedIn, Kuaishou, Kwai, Douyin, Dailymotion, CapCut và Bluesky'
-                                + '\n   (Hoặc sử dụng bằng cách trả lời tin nhắn chứa liên kết)'
-                }
-        },
+config: {
+name: "autodl",
+version: "3.8",
+author: "Saan Exhausted",
+countDown: 0,
+role: 0,
+description: {
+en: "Auto download video from TikTok, Facebook, Instagram, YouTube, and more",
+vi: "Tự động tải xuống video từ Tiktok, Facebook, Instagram, YouTube và nhiều hơn nữa"
+},
+category: "media",
+guide: {
+en: '   {pn} <video_link>: Automatically download videos from TikTok, YouTube, Twitter/X, Facebook, Instagram, Tumblr, Threads, Spotify, SoundCloud, Snapchat, Reddit, Pinterest, LinkedIn, Kuaishou, Kwai, Douyin, Dailymotion, CapCut, Bluesky, Terabox, Likee, Apple Music, and SnackVideo'
++ '\n   (Or use by replying to a message containing a link)'
++ '\n   {pn} list: Show all supported platforms',
+vi: '   {pn} <video_link>: Tự động tải video từ TikTok, YouTube, Twitter/X, Facebook, Instagram, Tumblr, Threads, Spotify, SoundCloud, Snapchat, Reddit, Pinterest, LinkedIn, Kuaishou, Kwai, Douyin, Dailymotion, CapCut, Bluesky, Terabox, Likee, Apple Music và SnackVideo'
++ '\n   (Hoặc sử dụng bằng cách trả lời tin nhắn chứa liên kết)'
++ '\n   {pn} list: Hiển thị tất cả nền tảng được hỗ trợ'
+}
+},
 
-        langs: {
-                en: {
-                        defaultCaption: "Downloaded Video",
-                        error: "× Failed to download video."
-                },
-                vi: {
-                        defaultCaption: "Video Đã Tải Xuống",
-                        error: "× Không thể tải xuống video."
-                }
-        },
+langs: {
+    en: {
+        defaultCaption: "𝐇𝐞𝐫𝐞'𝐬 𝐲𝐨𝐮𝐫 𝐕𝐢𝐝𝐞𝐨 𝐁𝐚𝐛𝐲 <😘\n\n• 𝐀𝐮𝐭𝐡𝐨𝐫: 𝐒𝐀𝐀𝐍 𝐄𝐗𝐇𝐀𝐔𝐒𝐓𝐄𝐃",
+        error: "× Failed to download video."
+    },
+    vi: {
+        defaultCaption: "Video Đã Tải Xuống\n\n• Author: SAAN EXHAUSTED",
+        error: "× Không thể tải xuống video."
+    }
+},
 
-        onStart: async function () {},
-
-        onChat: async function ({ api, event, getLang }) {
-                const authorName = "Saan";
-                if (this.config.author !== authorName) {
-                        return api.sendMessage("You are not authorized to change the author name.", event.threadID, event.messageID);
-                }
-                
-                let textInput = event.body ? event.body.trim() : "";
-
-                try {
-                        const exactUrlMatch = textInput.match(/^https?:\/\/[^\s]+$/i);
-                        if (!exactUrlMatch) return; 
-
-                        const mahmud = exactUrlMatch[0]; 
-
-                        if (
-                                mahmud.includes("tiktok.com") ||
-                                mahmud.includes("youtube.com") || 
-                                mahmud.includes("youtu.be") ||
-                                mahmud.includes("twitter.com") || 
-                                mahmud.includes("x.com") ||
-                                mahmud.includes("facebook.com") || 
-                                mahmud.includes("fb.watch") ||
-                                mahmud.includes("instagram.com") ||
-                                mahmud.includes("tumblr.com") ||
-                                mahmud.includes("threads.net") ||
-                                mahmud.includes("spotify.com") ||
-                                mahmud.includes("soundcloud.com") ||
-                                mahmud.includes("snapchat.com") ||
-                                mahmud.includes("reddit.com") ||
-                                mahmud.includes("pinterest.com") || 
-                                mahmud.includes("pin.it") ||
-                                mahmud.includes("linkedin.com") ||
-                                mahmud.includes("kuaishou.com") || 
-                                mahmud.includes("kwai.com") ||
-                                mahmud.includes("douyin.com") ||
-                                mahmud.includes("dailymotion.com") || 
-                                mahmud.includes("dai.ly") ||
-                                mahmud.includes("capcut.com") ||
-                                mahmud.includes("bsky.app")
-                        ) {
-                             api.setMessageReaction("🐤", event.messageID, (err) => {}, true);
-                                
-                                if (!fs.existsSync(__dirname + "/cache")) fs.mkdirSync(__dirname + "/cache");
-                                const path = __dirname + "/cache/mahmud.mp4";
-
-                                const response = await axios.get(`${await baseApiUrl()}/api/download?url=${encodeURIComponent(mahmud)}`);
-                                if (!response.data || !response.data.result) throw new Error("Failed to video URL");
-
-                                const videoUrl = response.data.result;
-                                const vid = (await axios.get(videoUrl, { responseType: "arraybuffer" })).data;
-                                fs.writeFileSync(path, Buffer.from(vid, "binary"));
-
-                                api.setMessageReaction("🪽", event.messageID, (err) => {}, true);
-                                api.sendMessage(
-                                        {
-                                                body: response.data.cp || getLang("defaultCaption"),
-                                                attachment: fs.createReadStream(path),
-                                        },
-                                        event.threadID,
-                                        () => fs.unlinkSync(path),
-                                        event.messageID
-                                );
-                        }
-                } catch (e) {
-                        api.setMessageReaction("❎", event.messageID, (err) => {}, true);
-                }
-        },
-};
-
- 
-// Saan author protection
-if (module.exports && module.exports.config) {
-  Object.defineProperty(module.exports, "__saanAuthorProtectionInstalled", {
-    value: true,
-    enumerable: false
-  });
-
-  for (const hook of [
-    "onStart", "onReply", "onChat", "onEvent",
-    "onAnyEvent", "onFirstChat", "onLoad"
-  ]) {
-    const original = module.exports[hook];
-    if (typeof original !== "function") continue;
-
-    module.exports[hook] = function (...args) {
-      if (module.exports.config.author !== "Saan") {
-        const data = args[0] || {};
-        const api = data.api;
-        const event = data.event;
-
-        if (api && event && event.threadID) {
-          return api.sendMessage(
-            "You are not authorized to change the author name.",
+onStart: async function ({ api, event, args }) {
+    if (args[0] && args[0].toLowerCase() === "list") {
+        return api.sendMessage(
+            (await axios.get(`${await baseApiUrl()}/api/download/list`)).data,
             event.threadID,
             event.messageID
-          );
+        );
+    }
+},
+
+onChat: async function ({ api, event, getLang }) {
+    const textInput = event.body ? event.body.trim() : "";
+
+    try {
+        const exactUrlMatch = textInput.match(/^https?:\/\/[^\s]+$/i);
+        if (!exactUrlMatch) return;
+
+        const url = exactUrlMatch[0];
+
+        const supportedPlatforms = [
+            "tiktok.com",
+            "youtube.com",
+            "youtu.be",
+            "twitter.com",
+            "x.com",
+            "facebook.com",
+            "fb.com",
+            "fb.watch",
+            "instagram.com",
+            "instagr.am",
+            "tumblr.com",
+            "threads.net",
+            "threads.com",
+            "spotify.com",
+            "spotify.link",
+            "soundcloud.com",
+            "snapchat.com",
+            "snap.com",
+            "reddit.com",
+            "redd.it",
+            "pinterest.com",
+            "pin.it",
+            "linkedin.com",
+            "lnkd.in",
+            "kuaishou.com",
+            "kwai.com",
+            "douyin.com",
+            "dailymotion.com",
+            "dai.ly",
+            "capcut.com",
+            "capcut.net",
+            "bsky.app",
+            "bsky.social",
+            "terabox.com",
+            "likee.video",
+            "music.apple.com",
+            "snackvideo.com",
+            "sck.io"
+        ];
+
+        if (!supportedPlatforms.some(platform => url.includes(platform))) {
+            return;
         }
 
-        if (data.message && typeof data.message.reply === "function") {
-          return data.message.reply("You are not authorized to change the author name.");
+        api.setMessageReaction("🐰", event.messageID, () => {}, true);
+
+        const response = await axios.get(
+            `${await baseApiUrl()}/api/download?url=${encodeURIComponent(url)}`
+        );
+
+        if (!response.data || !response.data.result) {
+            throw new Error("Failed to download video");
         }
 
-        return;
-      }
+        const videoUrl = response.data.result;
 
-      return original.apply(this, args);
-    };
-  }
+        const videoStream = await global.utils.getStreamFromURL(
+            videoUrl,
+            "video.mp4"
+        );
+
+        api.setMessageReaction("🪽", event.messageID, () => {}, true);
+
+        const isFacebook =
+            url.includes("facebook.com") ||
+            url.includes("fb.com") ||
+            url.includes("fb.watch");
+
+        const platform = isFacebook ? "𝐅𝐚𝐜𝐞𝐛𝐨𝐨𝐤" : "𝐕𝐢𝐝𝐞𝐨";
+
+        const caption =
+            `𝐇𝐞𝐫𝐞'𝐬 𝐲𝐨𝐮𝐫 ${platform} 𝐕𝐢𝐝𝐞𝐨 𝐁𝐚𝐛𝐲 <😘\n\n` +
+            `• 𝐀𝐮𝐭𝐡𝐨𝐫: 𝐒𝐀𝐀𝐍 𝐄𝐗𝐇𝐀𝐔𝐒𝐓𝐄𝐃`;
+
+        api.sendMessage(
+            {
+                body: caption,
+                attachment: videoStream
+            },
+            event.threadID,
+            event.messageID
+        );
+
+    } catch (error) {
+        console.error("AutoDL Error:", error);
+        api.setMessageReaction("❎", event.messageID, () => {}, true);
+    }
 }
+
+};
